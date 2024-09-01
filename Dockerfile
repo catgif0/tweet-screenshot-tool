@@ -16,4 +16,5 @@ RUN unzip /tmp/chromedriver.zip chromedriver -d /usr/local/bin/
 
 ENV DISPLAY=:99
 
-ENTRYPOINT ["python", "main.py"]
+# Run the application with Gunicorn
+CMD ["gunicorn", "-w", "4", "-b", "0.0.0.0:8080", "main:app"]

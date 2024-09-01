@@ -47,18 +47,20 @@ def upload_to_imgur(file_path):
 @app.route('/capture-tweet', methods=['POST'])
 def capture_tweet():
     logging.debug('Received request: %s', request.json)
-    data = request.json
-    tweet_url = data.get('tweet_url')
-    if tweet_url:
-        screenshot_file = 'tweet_screenshot.png'
-        capture_tweet_screenshot(tweet_url, screenshot_file)
-        imgur_url = upload_to_imgur(screenshot_file)
-        if imgur_url:
-            return jsonify({"status": "success", "imgur_url": imgur_url}), 200
-        else:
-            return jsonify({"status": "error", "message": "Failed to upload image to Imgur"}), 500
-    logging.error('Invalid request: tweet_url not provided')
-    return jsonify({"status": "error", "message": "Invalid request: tweet_url not provided"}), 400
+    if request.method == 'POST':
+        data = request.json
+        tweet_url = data.get('tweet_url')
+        if tweet_url:
+            screenshot_file = 'tweet_screenshot.png'
+            capture_tweet_screenshot(tweet_url, screenshot_file)
+            imgur_url = upload_to_imgur(screenshot_file)
+            if imgur_url:
+                return jsonify({"status": "success", "imgur_url": imgur_url}), 200
+            else:
+                return jsonify({"status": "error", "message": "Failed to upload image to Imgur"}), 500
+        logging.error('Invalid request: tweet_url not provided')
+        return jsonify({"status": "error", "message": "Invalid request: tweet_url not provided"}), 400
+
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=8080)

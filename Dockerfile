@@ -1,14 +1,14 @@
-FROM python:3.9-slim
+FROM debian:buster-slim
 
 WORKDIR /app
 
-ENV DEBIAN_FRONTEND=noninteractive
-ENV TERM=xterm
-
 COPY . .
 
+# Set TERM environment variable
+ENV TERM=xterm
+
 # Install necessary packages
-RUN apt-get update && apt-get install -y wget gnupg unzip
+RUN apt-get update && apt-get install -y wget gnupg unzip python3 python3-pip
 
 # Install Python dependencies (replace with your actual requirements)
 RUN pip install --no-cache-dir -r requirements.txt

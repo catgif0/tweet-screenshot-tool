@@ -5,7 +5,7 @@ WORKDIR /app
 COPY . .
 
 # Install necessary packages
-RUN apt-get update && apt-get install -y wget gnupg unzip --no-interactive
+RUN apt-get update && apt-get install -y wget gnupg unzip
 
 # Install Python dependencies (replace with your actual requirements)
 RUN pip install --no-cache-dir -r requirements.txt

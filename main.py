@@ -52,10 +52,10 @@ def upload_to_imgur(file_path):
             logging.error(f'Failed to upload image to Imgur: {response.status_code} {response.text}')
             return None
 
-@app.route('/capture-tweet', methods=['POST'])
+@app.route('/capture-tweet', methods=['GET', 'POST'])
 def capture_tweet():
-    logging.debug('Received request: %s', request.json)
     if request.method == 'POST':
+        logging.debug('Received POST request: %s', request.json)
         data = request.json
         tweet_url = data.get('tweet_url')
         if tweet_url:
@@ -69,7 +69,7 @@ def capture_tweet():
         logging.error('Invalid request: tweet_url not provided')
         return jsonify({"status": "error", "message": "Invalid request: tweet_url not provided"}), 400
     else:
-        logging.error('Invalid HTTP method used')
+        logging.info('Received GET request')
         return jsonify({"status": "error", "message": "Invalid HTTP method"}), 405
 
 if __name__ == '__main__':

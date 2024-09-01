@@ -18,13 +18,21 @@ def capture_tweet_screenshot(tweet_url, output_file):
     chrome_options.add_argument("--disable-dev-shm-usage")
 
     driver = webdriver.Chrome(options=chrome_options)
-    driver.get(tweet_url)
-    time.sleep(5)  # Wait for the tweet to load completely
-    driver.save_screenshot(output_file)
-    driver.quit()
+    try:
+        driver.get(tweet_url)
+        time.sleep(5)  # Wait for the tweet to load completely
+        driver.save_screenshot(output_file)
+        logging.debug(f'Screenshot saved to {output_file}')
+    except Exception as e:
+        logging.error(f'Error capturing tweet screenshot: {e}')
+    finally:
+        driver.quit()
 
 def upload_to_imgur(file_path):
     client_id = os.getenv('IMGUR_CLIENT_ID')
+    if not client_id:
+        logging.error('IMGUR_CLIENT_ID is not set in the environment variables.')
+        return None
 
     headers = {
         'Authorization': f'Client-ID {client_id}'
@@ -60,7 +68,9 @@ def capture_tweet():
                 return jsonify({"status": "error", "message": "Failed to upload image to Imgur"}), 500
         logging.error('Invalid request: tweet_url not provided')
         return jsonify({"status": "error", "message": "Invalid request: tweet_url not provided"}), 400
-
+    else:
+        logging.error('Invalid HTTP method used')
+        return jsonify({"status": "error", "message": "Invalid HTTP method"}), 405
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=8080)

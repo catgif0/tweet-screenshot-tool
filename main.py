@@ -52,27 +52,25 @@ def upload_to_imgur(file_path):
             logging.error(f'Failed to upload image to Imgur: {response.status_code} {response.text}')
             return None
 
-@app.route('/capture-tweet', methods=['POST'])
+@app.route('/capture-tweet', methods=['GET', 'POST'])
 def capture_tweet():
     if request.method == 'POST':
         logging.debug('Received POST request: %s', request.json)
-        data = request.json
-        tweet_url = data.get('tweet_url')
-        if tweet_url:
-            screenshot_file = 'tweet_screenshot.png'
-            capture_tweet_screenshot(tweet_url, screenshot_file)
-            imgur_url = upload_to_imgur(screenshot_file)
-            if imgur_url:
-                return jsonify({"status": "success", "imgur_url": imgur_url}), 200
-            else:
-                return jsonify({"status": "error", "message": "Failed to upload image to Imgur"}), 500
-        logging.error('Invalid request: tweet_url not provided')
-        return jsonify({"status": "error", "message": "Invalid request: tweet_url not provided"}), 400
+        tweet_url = request.json.get('tweet_url')
+    else:  # GET request
+        logging.debug('Received GET request: %s', request.args)
+        tweet_url = request.args.get('tweet_url')
 
-@app.route('/capture-tweet', methods=['GET'])
-def capture_tweet_get():
-    logging.info('Received GET request')
-    return jsonify({"status": "error", "message": "Invalid HTTP method"}), 405
+    if tweet_url:
+        screenshot_file = 'tweet_screenshot.png'
+        capture_tweet_screenshot(tweet_url, screenshot_file)
+        imgur_url = upload_to_imgur(screenshot_file)
+        if imgur_url:
+            return jsonify({"status": "success", "imgur_url": imgur_url}), 200
+        else:
+            return jsonify({"status": "error", "message": "Failed to upload image to Imgur"}), 500
+    logging.error('Invalid request: tweet_url not provided')
+    return jsonify({"status": "error", "message": "Invalid request: tweet_url not provided"}), 400
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=8080)

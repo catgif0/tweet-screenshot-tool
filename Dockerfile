@@ -2,10 +2,10 @@ FROM python:3.9-slim
 
 WORKDIR /app
 
-COPY . .
-
-# Set TERM environment variable
+ENV DEBIAN_FRONTEND=noninteractive
 ENV TERM=xterm
+
+COPY . .
 
 # Install necessary packages
 RUN apt-get update && apt-get install -y wget gnupg unzip
